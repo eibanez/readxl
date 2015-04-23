@@ -56,6 +56,46 @@ public:
     return sheetNames;
   }
 
+  Rcpp::CharacterVector namedranges() {
+    std::string workbookXml = zip_buffer(path_, "xl/workbook.xml");
+    rapidxml::xml_document<> workbook;
+    workbook.parse<0>(&workbookXml[0]);
+
+    int n = 200;
+    Rcpp::CharacterVector names(n);
+    Rcpp::CharacterVector values(n);
+
+    rapidxml::xml_node<>* root = workbook.first_node("workbook");
+    if (root == NULL)
+      return values;
+
+    rapidxml::xml_node<>* ranges = root->first_node("definedNames");
+    if (ranges == NULL)
+      return values;
+
+    int i = 0;
+    for (rapidxml::xml_node<>* range = ranges->first_node();
+         range; range = range->next_sibling()) {
+      if (i >= n) {
+        n *= 2;
+        names  = Rf_lengthgets(names, n);
+        values = Rf_lengthgets(values, n);
+      }
+      rapidxml::xml_attribute<>* rangename = range->first_attribute("name");
+      names[i]  = (rangename != NULL) ? Rf_mkCharCE(rangename->value(), CE_UTF8) : NA_STRING;
+      values[i] = (rangename != NULL) ? Rf_mkCharCE(range->value(),     CE_UTF8) : NA_STRING;
+      i++;
+    }
+
+    if (i != n) {
+      names  = Rf_lengthgets(names, i);
+      values = Rf_lengthgets(values, i);
+    }
+
+    values.attr("names") = names;
+
+    return values;
+  }
 
   const std::string& path() {
     return path_;
