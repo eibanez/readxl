@@ -42,6 +42,10 @@ public:
     return pWB_->sheets.count;
   }
 
+  int nDnames() const {
+    return pWB_->dnames.count;
+  }
+
   Rcpp::CharacterVector sheets() const {
     Rcpp::CharacterVector sheets(nSheets());
 
@@ -51,6 +55,32 @@ public:
 
     return sheets;
   }
+
+  Rcpp::DataFrame defined_names() const {
+    Rcpp::CharacterVector names(nDnames());
+    Rcpp::CharacterVector sheet(nDnames());
+    Rcpp::NumericVector   row1(nDnames());
+    Rcpp::NumericVector   row2(nDnames());
+    Rcpp::NumericVector   col1(nDnames());
+    Rcpp::NumericVector   col2(nDnames());
+
+    for (int i = 0; i < nDnames(); ++i) {
+      names[i] = Rf_mkCharCE((char*) pWB_->dnames.dname[i].name, CE_UTF8);
+      sheet[i] = Rf_mkCharCE((char*) pWB_->sheets.sheet[pWB_->dnames.dname[i].sheet].name, CE_UTF8);
+      row1[i]  = pWB_->dnames.dname[i].row1;
+      row2[i]  = pWB_->dnames.dname[i].row2;
+      col1[i]  = pWB_->dnames.dname[i].col1;
+      col2[i]  = pWB_->dnames.dname[i].col2;
+    }
+
+    return Rcpp::DataFrame::create(Rcpp::Named("name")  = names,
+                                   Rcpp::Named("sheet") = sheet,
+                                   Rcpp::Named("row1")  = row1,
+                                   Rcpp::Named("row2")  = row2,
+                                   Rcpp::Named("col1")  = col1,
+                                   Rcpp::Named("col2")  = col2);
+  }
+
 
   int nFormats() const {
     return pWB_->formats.count;

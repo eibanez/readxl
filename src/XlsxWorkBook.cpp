@@ -8,8 +8,8 @@ CharacterVector xlsx_sheets(std::string path) {
 }
 
 // [[Rcpp::export]]
-CharacterVector xlsx_namedranges(std::string path) {
-  return XlsxWorkBook(path).namedranges();
+CharacterVector xlsx_defined_names(std::string path) {
+  return XlsxWorkBook(path).defined_names();
 }
 
 // [[Rcpp::export]]

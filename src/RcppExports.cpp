@@ -50,6 +50,17 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// xls_defined_names
+DataFrame xls_defined_names(std::string path);
+RcppExport SEXP readxl_xls_defined_names(SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    __result = Rcpp::wrap(xls_defined_names(path));
+    return __result;
+END_RCPP
+}
 // xls_col_names
 CharacterVector xls_col_names(std::string path, int i, int nskip);
 RcppExport SEXP readxl_xls_col_names(SEXP pathSEXP, SEXP iSEXP, SEXP nskipSEXP) {
@@ -106,14 +117,14 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// xlsx_namedranges
-CharacterVector xlsx_namedranges(std::string path);
-RcppExport SEXP readxl_xlsx_namedranges(SEXP pathSEXP) {
+// xlsx_defined_names
+CharacterVector xlsx_defined_names(std::string path);
+RcppExport SEXP readxl_xlsx_defined_names(SEXP pathSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
-    __result = Rcpp::wrap(xlsx_namedranges(path));
+    __result = Rcpp::wrap(xlsx_defined_names(path));
     return __result;
 END_RCPP
 }

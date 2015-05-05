@@ -17,6 +17,10 @@ xls_sheets <- function(path) {
     .Call('readxl_xls_sheets', PACKAGE = 'readxl', path)
 }
 
+xls_defined_names <- function(path) {
+    .Call('readxl_xls_defined_names', PACKAGE = 'readxl', path)
+}
+
 xls_col_names <- function(path, i = 0L, nskip = 0L) {
     .Call('readxl_xls_col_names', PACKAGE = 'readxl', path, i, nskip)
 }
@@ -33,8 +37,8 @@ xlsx_sheets <- function(path) {
     .Call('readxl_xlsx_sheets', PACKAGE = 'readxl', path)
 }
 
-xlsx_namedranges <- function(path) {
-    .Call('readxl_xlsx_namedranges', PACKAGE = 'readxl', path)
+xlsx_defined_names <- function(path) {
+    .Call('readxl_xlsx_defined_names', PACKAGE = 'readxl', path)
 }
 
 xlsx_strings <- function(path) {

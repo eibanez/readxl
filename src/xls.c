@@ -60,6 +60,7 @@ extern void xls_addSST(xlsWorkBook* pWB,SST* sst,DWORD size);
 extern void xls_appendSST(xlsWorkBook* pWB,BYTE* buf,DWORD size);
 extern void xls_addFormat(xlsWorkBook* pWB,FORMAT* format);
 extern BYTE* xls_addSheet(xlsWorkBook* pWB,BOUNDSHEET* bs);
+extern void xls_addDname(xlsWorkBook* pWB, BYTE *n, WORD sh, WORD r1, WORD r2, WORD c1, WORD c2);
 extern void xls_addRow(xlsWorkSheet* pWS,ROW* row);
 extern void xls_makeTable(xlsWorkSheet* pWS);
 extern struct st_cell_data *xls_addCell(xlsWorkSheet* pWS,BOF* bof,BYTE* buf);
@@ -404,6 +405,25 @@ BYTE* xls_addSheet(xlsWorkBook* pWB, BOUNDSHEET *bs)
     pWB->sheets.count++;
 
 	return name;
+}
+
+void xls_addDname(xlsWorkBook* pWB, BYTE *n, WORD sh, WORD r1, WORD r2, WORD c1, WORD c2)
+{
+    if (pWB->dnames.count==0)
+    {
+        pWB->dnames.dname=(struct st_dname_data *) malloc(sizeof (struct st_dname_data));
+    }
+    else
+    {
+        pWB->dnames.dname=(struct st_dname_data *) realloc(pWB->dnames.dname,(pWB->dnames.count+1)*sizeof (struct st_dname_data));
+    }
+    pWB->dnames.dname[pWB->dnames.count].name=n;
+    pWB->dnames.dname[pWB->dnames.count].sheet=sh;
+    pWB->dnames.dname[pWB->dnames.count].row1=r1;
+    pWB->dnames.dname[pWB->dnames.count].row2=r2;
+    pWB->dnames.dname[pWB->dnames.count].col1=c1;
+    pWB->dnames.dname[pWB->dnames.count].col2=c2;
+    pWB->dnames.count++;
 }
 
 
@@ -912,11 +932,41 @@ void xls_parseWorkBook(xlsWorkBook* pWB)
 				printf("   mode: 0x%x\n", pWB->is1904);
 			}
 			break;
-		
-		case XLS_RECORD_DEFINEDNAME:
-			printf("DEFINEDNAME: ");
-			for(int i=0; i<bof1.size; ++i) printf("%2.2x ", buf[i]);
-			printf("\n");
+
+		case XLS_RECORD_DEFINEDNAME: {
+        DEFINEDNAME *dn = (DEFINEDNAME *) buf;
+
+        // Do this for global named ranges
+        if (dn->flag == 0x0000 && dn->global == 0x0000) {
+          xlsConvertDouble(&dn->ln);
+          dn->sz = xlsShortVal(dn->sz);
+
+          BYTE *name;
+          name = utf8_decode(&buf[15], dn->ln, pWB->charset);
+
+          // Parse the formula
+          if (buf[15 + dn->ln] == 0x3b) {
+            // Named range is an area
+            WORD *fsheet = (WORD *) &buf[15 + dn->ln + 1];
+            WORD *frow1  = (WORD *) &buf[15 + dn->ln + 3];
+            WORD *frow2  = (WORD *) &buf[15 + dn->ln + 5];
+            WORD *fcol1  = (WORD *) &buf[15 + dn->ln + 7];
+            WORD *fcol2  = (WORD *) &buf[15 + dn->ln + 9];
+
+            xls_addDname(pWB, name, xlsShortVal(*fsheet), xlsShortVal(*frow1), xlsShortVal(*frow2),
+                   xlsShortVal(*fcol1), xlsShortVal(*fcol2));
+          } else if (buf[15 + dn->ln] == 0x3a) {
+            // Named range is a single cell
+            WORD *fsheet = (WORD *) &buf[15 + dn->ln + 1];
+            WORD *frow   = (WORD *) &buf[15 + dn->ln + 3];
+            WORD *fcol   = (WORD *) &buf[15 + dn->ln + 5];
+
+            xls_addDname(pWB, name, xlsShortVal(*fsheet), xlsShortVal(*frow), xlsShortVal(*frow),
+                   xlsShortVal(*fcol), xlsShortVal(*fcol));
+          }
+        }
+		  }
+
 			break;
 			
 #ifdef DEBUG_DRAWINGS

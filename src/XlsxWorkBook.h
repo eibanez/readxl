@@ -56,7 +56,7 @@ public:
     return sheetNames;
   }
 
-  Rcpp::CharacterVector namedranges() {
+  Rcpp::CharacterVector defined_names() {
     std::string workbookXml = zip_buffer(path_, "xl/workbook.xml");
     rapidxml::xml_document<> workbook;
     workbook.parse<0>(&workbookXml[0]);

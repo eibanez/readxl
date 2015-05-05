@@ -28,3 +28,9 @@ CharacterVector xls_sheets(std::string path) {
   XlsWorkBook wb(path);
   return wb.sheets();
 }
+
+// [[Rcpp::export]]
+DataFrame xls_defined_names(std::string path) {
+  XlsWorkBook wb(path);
+  return wb.defined_names();
+}

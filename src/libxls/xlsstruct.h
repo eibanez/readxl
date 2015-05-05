@@ -227,6 +227,28 @@ typedef struct LABEL
 LABEL;
 typedef LABEL LABELSST;
 
+typedef struct DEFINEDNAME
+{
+    WORD  flag;
+    BYTE  shortcut;
+    BYTE  ln;
+    WORD  sz;
+    WORD	notused;
+    WORD  global;
+    BYTE  lm;
+    BYTE  ld;
+    BYTE  lh;
+    BYTE  ls;
+    BYTE  other[1]; // var
+    BYTE  *form;
+    WORD  *fsheet;
+    WORD  *frow1;
+    WORD  *frow2;
+    WORD  *fcol1;
+    WORD  *fcol2;
+}
+DEFINEDNAME;
+
 typedef struct BOOLERR
 {
     WORD    row;
@@ -341,6 +363,23 @@ typedef	struct st_sheet
     * sheet;
 }
 st_sheet;
+
+typedef  struct st_dname
+{
+    DWORD count;        // Count of sheets
+    struct st_dname_data
+    {
+        BYTE *name;
+        WORD  sheet;
+        WORD  row1;
+        WORD  row2;
+        WORD  col1;
+        WORD  col2;
+    }
+    * dname;
+}
+st_dname;
+
 
 typedef	struct st_font
 {
@@ -486,6 +525,7 @@ typedef struct xlsWorkBook
     WORD		codepage;		// Charset codepage
     char*		charset;
     st_sheet	sheets;
+    st_dname  dnames;
     st_sst		sst;			// SST table
     st_xf		xfs;			// XF table
     st_font		fonts;
