@@ -13,7 +13,7 @@ named_ranges <- function(path) {
   )
 }
 
-# Extract correct named ranges
+# Extract correct named ranges for XLS file
 xls_namedranges <- function(path) {
   x <- xls_defined_names(path)
 
@@ -27,15 +27,19 @@ xls_namedranges <- function(path) {
   x[, c("name", "sheet", "range")]
 }
 
-# Extract correct named ranges
+# Extract correct named ranges for XLSX file
 xlsx_namedranges <- function(path) {
   ranges <- xlsx_defined_names(path)
 
-  # A single named range can refer to multiple selection areas. Return only the first one
-  clean.ranges <- gsub("\\+.+", "", ranges)
+  # Return empty data.frame if no defined names were found
+  if (length(ranges) == 0L)
+    return(data.frame(name = character(0), sheet = character(0), range = character(0)))
 
-  data.frame(name = names(ranges),
-             sheet = gsub("\\!.+", "", clean.ranges),
-             range = gsub(".+\\!", "", clean.ranges),
+  # A single named range can refer to multiple selection areas. These are separated with '+' or ','
+  valid.ranges <- grep("\\+.+", ranges, value = TRUE, invert = TRUE)
+
+  data.frame(name = names(valid.ranges),
+             sheet = gsub("\\!.+", "", valid.ranges),
+             range = gsub(".+\\!", "", valid.ranges),
              stringsAsFactors = FALSE)
 }

@@ -67,11 +67,11 @@ public:
 
     rapidxml::xml_node<>* root = workbook.first_node("workbook");
     if (root == NULL)
-      return values;
+      return Rcpp::CharacterVector(0);
 
     rapidxml::xml_node<>* ranges = root->first_node("definedNames");
     if (ranges == NULL)
-      return values;
+      return Rcpp::CharacterVector(0);
 
     int i = 0;
     for (rapidxml::xml_node<>* range = ranges->first_node();
