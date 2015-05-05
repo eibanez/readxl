@@ -16,10 +16,10 @@ named_ranges <- function(path) {
 # Extract correct named ranges
 xls_namedranges <- function(path) {
   x <- xls_defined_names(path)
-  ranges$range <- paste0(cellranger::num_to_letter(x$col1), x$row1,
-                         ":",
-                         cellranger::num_to_letter(x$col2), x$row2)
-  ranges[, c("name", "sheet", "range")]
+  x$range <- paste0(cellranger::num_to_letter(x$col1), x$row1,
+                    ":",
+                    cellranger::num_to_letter(x$col2), x$row2)
+  x[, c("name", "sheet", "range")]
 }
 
 # Extract correct named ranges
