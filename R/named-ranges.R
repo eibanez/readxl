@@ -15,7 +15,11 @@ named_ranges <- function(path) {
 
 # Extract correct named ranges
 xls_namedranges <- function(path) {
-  xls_defined_names(path)
+  ranges <- xls_defined_names(path)
+  rc1 <- sprintf("R%sC%s", ranges$row1, ranges$col1)
+  rc2 <- sprintf("R%sC%s", ranges$row2, ranges$col2)
+  ranges$range <- paste0(cellranger::RC_to_A1(rc1), ":", cellranger::RC_to_A1(rc2))
+  ranges[, c("name", "sheet", "range")]
 }
 
 # Extract correct named ranges
@@ -26,7 +30,6 @@ xlsx_namedranges <- function(path) {
   clean.ranges <- gsub("\\+.+", "", ranges)
 
   data.frame(name = names(ranges),
-             formula = ranges,
              sheet = gsub("\\!.+", "", clean.ranges),
              range = gsub(".+\\!", "", clean.ranges),
              stringsAsFactors = FALSE)
