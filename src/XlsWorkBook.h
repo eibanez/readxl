@@ -75,10 +75,10 @@ public:
 
     return Rcpp::DataFrame::create(Rcpp::Named("name")  = names,
                                    Rcpp::Named("sheet") = sheet,
-                                   Rcpp::Named("row1")  = row1,
-                                   Rcpp::Named("row2")  = row2,
-                                   Rcpp::Named("col1")  = col1,
-                                   Rcpp::Named("col2")  = col2);
+                                   Rcpp::Named("row1")  = row1 + 1,
+                                   Rcpp::Named("row2")  = row2 + 1,
+                                   Rcpp::Named("col1")  = col1 + 1,
+                                   Rcpp::Named("col2")  = col2 + 1);
   }
 
 
